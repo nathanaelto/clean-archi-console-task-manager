@@ -11,4 +11,8 @@ In [this file](./subject.md), you can find the subject of the task.
 - [X] Clément HOTTOT
 - [X] Amélie DOUILLARD
 
-Or found in [this file](./members.md).
+Or found in [this file](./members.md)
+
+## How to use
+- Clone this repository
+- 
