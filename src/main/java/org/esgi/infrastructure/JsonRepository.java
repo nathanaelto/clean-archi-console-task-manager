@@ -5,6 +5,7 @@ import org.esgi.domain.repository.ITaskRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class JsonRepository implements ITaskRepository {
@@ -41,7 +42,7 @@ public class JsonRepository implements ITaskRepository {
         try {
             this.load();
             for (Task task : tasks) {
-                if (task.id == id) {
+                if (Objects.equals(task.id, id)) {
                     return Optional.of(task);
                 }
             }
@@ -56,7 +57,7 @@ public class JsonRepository implements ITaskRepository {
         try {
             this.load();
             for (Task task : tasks) {
-                if (task.id == updatedTask.id) {
+                if (Objects.equals(task.id, updatedTask.id)) {
                     task = updatedTask;
                 }
             }

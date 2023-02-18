@@ -14,5 +14,4 @@ In [this file](./subject.md), you can find the subject of the task.
 Or found in [this file](./members.md)
 
 ## How to use
-- Clone this repository
-- 
+(WIP)
