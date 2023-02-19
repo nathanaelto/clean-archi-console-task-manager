@@ -8,7 +8,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -32,7 +34,7 @@ public class TaskServiceTest {
     @Test
     void should_call_the_add_repository_when_creating_task() {
         when(repository.add(any())).thenReturn(Optional.of(1));
-        Task task = new Task("test");
+        Task task = new Task("test", LocalDateTime.now());
 
         taskService.addTask(task);
 
@@ -42,7 +44,7 @@ public class TaskServiceTest {
     @Test
     void should_throw_an_exeption_when_can_t_create_task() {
         when(repository.add(any())).thenReturn(Optional.empty());
-        Task task = new Task("test");
+        Task task = new Task("test", LocalDateTime.now());
 
         Assertions.assertThrows( RuntimeException.class, () -> {
             taskService.addTask(task);
@@ -53,6 +55,11 @@ public class TaskServiceTest {
 
     @Test
     void should_call_the_update_task_when_updating_task() {
+        Clock clock = Clock.fixed(
+                LocalDateTime.of(2020, 1, 1, 1, 1).toInstant(ZoneOffset.UTC),
+                ZoneOffset.UTC
+        );
+        Task.setLocalDateTime(clock);
         Task task = new Task(
                 1,
                 "test",
@@ -66,14 +73,13 @@ public class TaskServiceTest {
         taskService.updateTask(1, Optional.of("test 2"), Optional.of(TaskState.DONE), Optional.empty());
 
         verify(repository, times(1)).get(1);
-        //todo : problem with localdatetime, do a factory
         Task updatedTask = new Task(
                 1,
                 "test 2",
                 LocalDateTime.of(2020, 1, 1, 1, 1),
                 Optional.empty(),
                 TaskState.DONE,
-                Optional.of(LocalDateTime.now())
+                Optional.of(LocalDateTime.now(clock))
         );
         verify(repository, times(1)).update(updatedTask);
     }
@@ -92,6 +98,11 @@ public class TaskServiceTest {
 
     @Test
     void should_call_the_update_task_when_deleting_task() {
+        Clock clock = Clock.fixed(
+                LocalDateTime.of(2020, 1, 1, 1, 1).toInstant(ZoneOffset.UTC),
+                ZoneOffset.UTC
+        );
+        Task.setLocalDateTime(clock);
         Task task = new Task(
                 1,
                 "test",
@@ -105,14 +116,13 @@ public class TaskServiceTest {
         taskService.removeTask(1);
 
         verify(repository, times(1)).get(1);
-        //todo : problem with localdatetime, do a factory
         Task updatedTask = new Task(
                 1,
                 "test",
                 LocalDateTime.of(2020, 1, 1, 1, 1),
                 Optional.empty(),
                 TaskState.CANCELED,
-                Optional.of(LocalDateTime.now())
+                Optional.of(LocalDateTime.now(clock))
         );
         verify(repository, times(1)).update(updatedTask);
     }

@@ -1,11 +1,10 @@
 package org.esgi.domain.models;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
-
-// todo factory with localdatetime
 // todo implement subtask
 // todo implement tags
 
@@ -17,14 +16,17 @@ public class Task {
     private final Optional<LocalDateTime> closeDate;
     private final TaskState state;
 
-    public final static Integer UNDEFINED_ID = -1;
+    private static Clock clock = Clock.systemDefaultZone();
 
-    public Task(String description) {
-        this(UNDEFINED_ID, description, LocalDateTime.now(), Optional.empty(), TaskState.TODO, Optional.empty());
+    public static void setLocalDateTime(Clock clock) {
+        Task.clock = clock;
     }
 
+    public final static Integer UNDEFINED_ID = -1;
+
+    // todo ne plus passer par ça
     public Task(String description, LocalDateTime dueDate) {
-        this(UNDEFINED_ID, description, LocalDateTime.now(), Optional.of(dueDate), TaskState.TODO, Optional.empty());
+        this(UNDEFINED_ID, description, LocalDateTime.now(clock), Optional.of(dueDate), TaskState.TODO, Optional.empty());
     }
 
     public Task(Integer id, String description, LocalDateTime creationDate, Optional<LocalDateTime> dueDate, TaskState state, Optional<LocalDateTime> closeDate) {
@@ -61,7 +63,7 @@ public class Task {
     }
 
     public Task cancelTask() {
-        return new Task(this.id, this.description, this.creationDate, this.dueDate, TaskState.CANCELED, Optional.of(LocalDateTime.now()));
+        return new Task(this.id, this.description, this.creationDate, this.dueDate, TaskState.CANCELED, Optional.of(LocalDateTime.now(clock)));
     }
 
     public Task updateTaskId(Integer id) {
@@ -71,7 +73,7 @@ public class Task {
     public Task updateTask(Optional<String> description, Optional<TaskState> state, Optional<LocalDateTime> dueDate) {
         Optional<LocalDateTime> closeDate = state.map(newState -> {
                     if (newState == TaskState.CLOSED || newState == TaskState.DONE || newState == TaskState.CANCELED) {
-                        return LocalDateTime.now();
+                        return LocalDateTime.now(clock);
                     }
                     return this.closeDate.orElse(null);
                 }
