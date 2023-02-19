@@ -1,4 +1,4 @@
-package org.esgi.domain.servcies;
+package org.esgi.domain.services;
 
 import org.esgi.domain.models.Task;
 import org.esgi.domain.models.TaskState;

@@ -1,12 +1,13 @@
-package org.esgi.exposition;
+package org.esgi.infrastructure.io;
 
 import org.esgi.domain.exposition.UserInterface;
 import org.esgi.domain.models.Task;
 import org.esgi.domain.models.TaskState;
-import org.esgi.domain.servcies.ITaskService;
+import org.esgi.domain.services.ITaskService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.Optional;
 
 public class CLIInterface implements UserInterface {
@@ -54,7 +55,11 @@ public class CLIInterface implements UserInterface {
             throw new RuntimeException("Wrong argument number");
         }
 
-        taskService.getAllTask();
+        taskService.getAllTask()
+                .stream()
+                .sorted(Comparator.comparing(Task::getCreationDate))
+                .toList()
+                .forEach(System.out::println);
     }
 
     public void parseUpdateArguments() {
@@ -127,5 +132,4 @@ public class CLIInterface implements UserInterface {
 
         return args[i];
     }
-
 }

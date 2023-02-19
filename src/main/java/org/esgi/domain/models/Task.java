@@ -1,18 +1,21 @@
 package org.esgi.domain.models;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
-//             todo     factory with localdatetime
+// todo factory with localdatetime
+// todo implement subtask
 
 public class Task {
-    public final Integer id;
-    public final String description;
-    public final LocalDateTime creationDate;
-    public final Optional<LocalDateTime> dueDate;
-    public final Optional<LocalDateTime> closeDate;
-    public final TaskState state;
+    private final Integer id;
+    private final String description;
+    private final LocalDateTime creationDate;
+    private final Optional<LocalDateTime> dueDate;
+    private final Optional<LocalDateTime> closeDate;
+    private final TaskState state;
 
     public final static Integer UNDEFINED_ID = -1;
 
@@ -33,8 +36,32 @@ public class Task {
         this.closeDate = closeDate;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public LocalDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Optional<LocalDateTime> getDueDate() {
+        return dueDate;
+    }
+
+    public Optional<LocalDateTime> getCloseDate() {
+        return closeDate;
+    }
+
+    public TaskState getState() {
+        return state;
+    }
+
     public Task cancelTask() {
-        return new Task(this.id, this.description, this.creationDate, this.dueDate, TaskState.CANCELED, closeDate);
+        return new Task(this.id, this.description, this.creationDate, this.dueDate, TaskState.CANCELED, Optional.of(LocalDateTime.now()));
     }
 
     public Task updateTaskId(Integer id) {
@@ -50,5 +77,28 @@ public class Task {
                 }
         );
         return new Task(this.id, description.orElse(this.description), this.creationDate, Optional.ofNullable(dueDate.orElse(this.dueDate.orElse(null))), state.orElse(this.state), closeDate);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return Objects.equals(id, task.id) && Objects.equals(description, task.description) && Objects.equals(creationDate, task.creationDate) && Objects.equals(dueDate, task.dueDate) && Objects.equals(closeDate, task.closeDate) && state == task.state;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, description, creationDate, dueDate, closeDate, state);
+    }
+
+    @Override
+    public String toString() {
+        return "id=" + id +
+                ", description='" + description + '\'' +
+                ", creationDate=" + creationDate +
+                ", dueDate=" + dueDate +
+                ", closeDate=" + closeDate +
+                ", state=" + state;
     }
 }
