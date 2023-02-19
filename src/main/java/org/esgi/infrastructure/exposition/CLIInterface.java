@@ -3,6 +3,8 @@ package org.esgi.infrastructure.exposition;
 import org.esgi.domain.exposition.UserInterface;
 import org.esgi.domain.models.Task;
 import org.esgi.domain.models.TaskState;
+import org.esgi.domain.models.dto.CreateTask;
+import org.esgi.domain.models.dto.UpdateTask;
 import org.esgi.domain.services.ITaskService;
 
 import java.time.LocalDateTime;
@@ -15,9 +17,6 @@ public class CLIInterface implements UserInterface {
     private final String[] args;
     private final ITaskService taskService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm");
-    private LocalDateTime dueDate;
-    private TaskState state;
-    private String content;
 
     public CLIInterface(ITaskService taskService, String[] args) {
         this.taskService = taskService;
@@ -43,11 +42,28 @@ public class CLIInterface implements UserInterface {
         if (args.length < 3) {
             throw new RuntimeException("Wrong argument number");
         }
-        parseArgumentOptions(1);
 
-        Task task = new Task(content, dueDate);
-        Integer id = taskService.addTask(task);
+        CreateTask createTask = parseAdd();
+        Integer id = taskService.addTask(createTask);
         System.out.println("Task added with id: " + id);
+    }
+
+    private CreateTask parseAdd() {
+        if (args.length < 3) {
+            throw new RuntimeException("Wrong argument number");
+        }
+
+        CreateTask createTask = new CreateTask();
+        int index = 1;
+        while (index < args.length) {
+            if (args[index].startsWith("-c"))
+                createTask.description = parseContent(++index);
+            if (args[index].startsWith("-d:"))
+                createTask.dueDate = Optional.of(parseDate(index));
+            index++;
+        }
+
+        return createTask;
     }
 
     public void parseListArguments() {
@@ -66,10 +82,36 @@ public class CLIInterface implements UserInterface {
         if (args.length < 3) {
             throw new RuntimeException("Wrong argument number");
         }
-        Integer id = Integer.parseInt(args[1]);
 
-        parseArgumentOptions(2);
-        taskService.updateTask(id, Optional.ofNullable(content), Optional.ofNullable(state), Optional.ofNullable(dueDate));
+        Integer id = Integer.parseInt(args[1]);
+        if (id < 0) {
+            throw new RuntimeException("Wrong argument number");
+        }
+
+        UpdateTask updateTask = parseUpdate();
+        updateTask.id = id;
+
+        taskService.updateTask(updateTask);
+    }
+
+    private UpdateTask parseUpdate() {
+        if (args.length < 3) {
+            throw new RuntimeException("Wrong argument number");
+        }
+
+        UpdateTask updateTask = new UpdateTask();
+        int index = 2;
+        while (index < args.length) {
+            if (args[index].startsWith("-c"))
+                updateTask.description = Optional.of(parseContent(++index));
+            if (args[index].startsWith("-d:"))
+                updateTask.dueDate = Optional.of(parseDate(index));
+            if (args[index].startsWith("-s:"))
+                updateTask.state = Optional.of(parseState(index));
+            index++;
+        }
+
+        return updateTask;
     }
 
     public void parseRemoveArguments() {
@@ -82,31 +124,12 @@ public class CLIInterface implements UserInterface {
     }
 
 
-    private void parseArgumentOptions(int start) {
-        for (int i = start; i < args.length; i+=2) {
-            parseArgumentOption(i);
-        }
-    }
-
-    private void parseArgumentOption(int i) {
-        if (i >= args.length) {
-            throw new RuntimeException("Wrong argument number");
-        }
-
-        switch (args[i]) {
-            case "-d" -> dueDate = parseDate(i + 1);
-            case "-s" -> state = parseState(i + 1);
-            case "-c" -> content = parseContent(i + 1);
-            default -> throw new RuntimeException("Unkwonw argument: " + args[0]);
-        }
-    }
-
     private LocalDateTime parseDate(int i) {
         if (i >= args.length) {
             throw new RuntimeException("Wrong argument number");
         }
 
-        return LocalDateTime.parse(args[i], formatter);
+        return LocalDateTime.parse(args[i].substring(3), formatter);
     }
 
     private TaskState parseState(int i) {
@@ -114,7 +137,7 @@ public class CLIInterface implements UserInterface {
             throw new RuntimeException("Wrong argument number");
         }
 
-        return switch (args[i]) {
+        return switch (args[i].substring(3)) {
             case "todo" -> TaskState.TODO;
             case "progress" -> TaskState.IN_PROGRESS;
             case "done" -> TaskState.DONE;

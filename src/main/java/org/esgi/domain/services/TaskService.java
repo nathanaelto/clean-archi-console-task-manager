@@ -1,13 +1,11 @@
 package org.esgi.domain.services;
 
 import org.esgi.domain.models.Task;
-import org.esgi.domain.models.TaskState;
+import org.esgi.domain.models.dto.CreateTask;
+import org.esgi.domain.models.dto.UpdateTask;
 import org.esgi.domain.repository.ITaskRepository;
-import org.esgi.domain.services.ITaskService;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 // todo : exception custom
 public class TaskService implements ITaskService {
@@ -18,18 +16,17 @@ public class TaskService implements ITaskService {
         this.repository = repository;
     }
 
-    //todo : dto pour create et la passer au repository
     @Override
-    public Integer addTask(Task task) {
+    public Integer addTask(CreateTask createTask) {
+        Task task = Task.fromCreatedTask(createTask);
         return repository.add(task)
-                .orElseThrow(()-> new RuntimeException("Task not added"));
+                .orElseThrow(() -> new RuntimeException("Task not added"));
     }
 
-    //todo : dto pour update et la passer au repository
     @Override
-    public void updateTask(Integer id, Optional<String> description, Optional<TaskState> state, Optional<LocalDateTime> dueDate) {
-        Task task = repository.get(id).orElseThrow(() -> new RuntimeException("Task not found"));
-        task = task.updateTask(description, state, dueDate);
+    public void updateTask(UpdateTask updateTask) {
+        Task task = repository.get(updateTask.id).orElseThrow(() -> new RuntimeException("Task not found"));
+        task = task.updateTask(updateTask.description, updateTask.state, updateTask.dueDate);
         repository.update(task);
     }
 

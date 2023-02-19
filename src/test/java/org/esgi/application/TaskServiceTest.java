@@ -2,6 +2,8 @@ package org.esgi.application;
 
 import org.esgi.domain.models.Task;
 import org.esgi.domain.models.TaskState;
+import org.esgi.domain.models.dto.CreateTask;
+import org.esgi.domain.models.dto.UpdateTask;
 import org.esgi.domain.repository.ITaskRepository;
 import org.esgi.domain.services.TaskService;
 import org.junit.jupiter.api.Assertions;
@@ -32,23 +34,34 @@ public class TaskServiceTest {
 
     @Test
     void should_call_the_add_repository_when_creating_task() {
+        Clock clock = Clock.fixed(
+                LocalDateTime.of(2020, 1, 1, 1, 1).toInstant(ZoneOffset.UTC),
+                ZoneOffset.UTC
+        );
+        Task.setLocalDateTime(clock);
         when(repository.add(any())).thenReturn(Optional.of(1));
-        Task task = new Task("test", LocalDateTime.now());
+        CreateTask createdTask = new CreateTask("test", Optional.of(LocalDateTime.now(clock)));
 
-        taskService.addTask(task);
-
+        taskService.addTask(createdTask);
+        Task task = Task.fromCreatedTask(createdTask);
         verify(repository, times(1)).add(task);
     }
 
     @Test
-    void should_throw_an_exeption_when_can_t_create_task() {
+    void should_throw_an_exception_when_can_t_create_task() {
+        Clock clock = Clock.fixed(
+                LocalDateTime.of(2020, 1, 1, 1, 1).toInstant(ZoneOffset.UTC),
+                ZoneOffset.UTC
+        );
+        Task.setLocalDateTime(clock);
         when(repository.add(any())).thenReturn(Optional.empty());
-        Task task = new Task("test", LocalDateTime.now());
+        CreateTask createdTask = new CreateTask("test", Optional.of(LocalDateTime.now(clock)));
 
-        Assertions.assertThrows( RuntimeException.class, () -> {
-            taskService.addTask(task);
+        Assertions.assertThrows(RuntimeException.class, () -> {
+            taskService.addTask(createdTask);
         });
 
+        Task task = Task.fromCreatedTask(createdTask);
         verify(repository, times(1)).add(task);
     }
 
@@ -69,7 +82,13 @@ public class TaskServiceTest {
         );
         when(repository.get(1)).thenReturn(Optional.of(task));
 
-        taskService.updateTask(1, Optional.of("test 2"), Optional.of(TaskState.DONE), Optional.empty());
+        UpdateTask updateTask = new UpdateTask(
+                1,
+                Optional.of("test 2"),
+                Optional.of(TaskState.DONE),
+                Optional.empty()
+        );
+        taskService.updateTask(updateTask);
 
         verify(repository, times(1)).get(1);
         Task updatedTask = new Task(
@@ -87,9 +106,15 @@ public class TaskServiceTest {
     void should_throw_exception_when_updating_task_that_does_not_exist() {
         when(repository.get(anyInt())).thenReturn(Optional.empty());
 
+        UpdateTask updateTask = new UpdateTask(
+                1,
+                Optional.of("test 2"),
+                Optional.of(TaskState.DONE),
+                Optional.of(LocalDateTime.now())
+        );
 
         Assertions.assertThrows(RuntimeException.class, () -> {
-            taskService.updateTask(1, Optional.of("test"), Optional.of(TaskState.DONE), Optional.of(LocalDateTime.now()));
+            taskService.updateTask(updateTask);
         });
         verify(repository, times(1)).get(1);
         verify(repository, times(0)).update(any());

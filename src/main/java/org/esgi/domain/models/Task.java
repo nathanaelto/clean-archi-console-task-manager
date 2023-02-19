@@ -1,5 +1,7 @@
 package org.esgi.domain.models;
 
+import org.esgi.domain.models.dto.CreateTask;
+
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -17,6 +19,15 @@ public class Task {
     private final TaskState state;
 
     private static Clock clock = Clock.systemDefaultZone();
+
+    public Task(Integer id, String description, LocalDateTime creationDate, Optional<LocalDateTime> dueDate, Optional<LocalDateTime> closeDate, TaskState state) {
+        this.id = id;
+        this.description = description;
+        this.creationDate = creationDate;
+        this.dueDate = dueDate;
+        this.closeDate = closeDate;
+        this.state = state;
+    }
 
     public static void setLocalDateTime(Clock clock) {
         Task.clock = clock;
@@ -37,6 +48,18 @@ public class Task {
         this.state = state;
         this.closeDate = closeDate;
     }
+
+    public static Task fromCreatedTask(CreateTask createTask) {
+        return new Task(
+                null,
+                createTask.description,
+                LocalDateTime.now(clock),
+                createTask.dueDate,
+                createTask.state.orElse(TaskState.TODO),
+                Optional.empty()
+        );
+    }
+
 
     public Integer getId() {
         return id;
