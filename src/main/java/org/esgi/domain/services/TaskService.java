@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+// todo : exception custom
 public class TaskService implements ITaskService {
 
     private final ITaskRepository repository;
@@ -17,12 +18,14 @@ public class TaskService implements ITaskService {
         this.repository = repository;
     }
 
+    //todo : dto pour create et la passer au repository
     @Override
     public Integer addTask(Task task) {
         return repository.add(task)
                 .orElseThrow(()-> new RuntimeException("Task not added"));
     }
 
+    //todo : dto pour update et la passer au repository
     @Override
     public void updateTask(Integer id, Optional<String> description, Optional<TaskState> state, Optional<LocalDateTime> dueDate) {
         Task task = repository.get(id).orElseThrow(() -> new RuntimeException("Task not found"));

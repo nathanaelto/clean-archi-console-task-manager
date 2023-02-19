@@ -1,4 +1,4 @@
-package org.esgi.infrastructure.io;
+package org.esgi.infrastructure.exposition;
 
 import org.esgi.domain.exposition.UserInterface;
 import org.esgi.domain.models.Task;

@@ -4,7 +4,7 @@ import org.esgi.domain.services.TaskService;
 import org.esgi.domain.exposition.UserInterface;
 import org.esgi.domain.repository.ITaskRepository;
 import org.esgi.domain.services.ITaskService;
-import org.esgi.infrastructure.io.CLIInterface;
+import org.esgi.infrastructure.exposition.CLIInterface;
 import org.esgi.infrastructure.repository.json.JsonFileRepository;
 import org.esgi.infrastructure.repository.json.JsonRepository;
 

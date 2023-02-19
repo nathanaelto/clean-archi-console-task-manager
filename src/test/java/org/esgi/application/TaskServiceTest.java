@@ -24,7 +24,6 @@ public class TaskServiceTest {
     private TaskService taskService;
     private ITaskRepository repository;
 
-
     @BeforeEach
     void setup() {
         repository = mock(ITaskRepository.class);
