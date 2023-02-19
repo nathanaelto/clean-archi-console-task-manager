@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static org.esgi.domain.models.Task.UNDEFINED_ID;
+
 public class JsonRepository implements ITaskRepository {
 
     private final JsonFileRepository jsonFileRepository;
     private List<Task> tasks;
 
-    public JsonRepository(JsonFileRepository jsonFileRepository) throws Exception {
+    public JsonRepository(JsonFileRepository jsonFileRepository) {
         this.jsonFileRepository = jsonFileRepository;
     }
 
@@ -32,8 +34,8 @@ public class JsonRepository implements ITaskRepository {
     public Integer add(Task task) {
         try {
             this.load();
-            if (task.id == null) {
-                task.id = tasks.size();
+            if (Objects.equals(task.id, UNDEFINED_ID)) {
+                task = task.updateTaskId(tasks.size());
             }
             tasks.add(task);
             this.save();
@@ -49,6 +51,7 @@ public class JsonRepository implements ITaskRepository {
     public Optional<Task> get(Integer id) {
         try {
             this.load();
+            //todo use stream
             for (Task task : tasks) {
                 if (Objects.equals(task.id, id)) {
                     return Optional.of(task);
@@ -65,8 +68,7 @@ public class JsonRepository implements ITaskRepository {
         try {
             this.load();
 
-            if( tasks.removeIf(task -> Objects.equals(task.id, updatedTask.id)))
-            {
+            if (tasks.removeIf(task -> Objects.equals(task.id, updatedTask.id))) {
                 tasks.add(updatedTask);
             }
 

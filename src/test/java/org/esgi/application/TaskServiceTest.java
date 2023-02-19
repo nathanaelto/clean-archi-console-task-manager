@@ -1,7 +1,6 @@
 package org.esgi.application;
 
 import org.esgi.domain.repository.ITaskRepository;
-import org.esgi.domain.models.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,8 +20,8 @@ public class TaskServiceTest {
 
     @Test
     void should_call_the_add_repository_when_creating_task() {
-
-        verify(repository, times(1)).;
+        //taskService.addTask();
+        verify(repository, times(1)).add(any());
     }
 
     @Test

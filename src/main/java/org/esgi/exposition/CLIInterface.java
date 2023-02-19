@@ -7,6 +7,7 @@ import org.esgi.domain.servcies.ITaskService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 public class CLIInterface implements UserInterface {
 
@@ -43,7 +44,7 @@ public class CLIInterface implements UserInterface {
         }
         parseArgumentOptions(1);
 
-        Task task = new Task(null, content, dueDate, state);
+        Task task = new Task(content, dueDate);
         Integer id = taskService.addTask(task);
         System.out.println("Task added with id: " + id);
     }
@@ -63,9 +64,7 @@ public class CLIInterface implements UserInterface {
         Integer id = Integer.parseInt(args[1]);
 
         parseArgumentOptions(2);
-        Task task = new Task(id, content, dueDate, state);
-
-        taskService.updateTask(task);
+        taskService.updateTask(id, Optional.ofNullable(content), Optional.ofNullable(state), Optional.ofNullable(dueDate));
     }
 
     public void parseRemoveArguments() {

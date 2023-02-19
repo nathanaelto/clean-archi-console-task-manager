@@ -5,7 +5,9 @@ import org.esgi.domain.models.TaskState;
 import org.esgi.domain.repository.ITaskRepository;
 import org.esgi.domain.servcies.ITaskService;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public class TaskService implements ITaskService {
 
@@ -27,7 +29,9 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void updateTask(Task task) {
+    public void updateTask(Integer id, Optional<String> description, Optional<TaskState> state, Optional<LocalDateTime> dueDate) {
+        Task task = repository.get(id).orElseThrow(() -> new RuntimeException("Task not found"));
+        task = task.updateTask(description, state, dueDate);
         repository.update(task);
     }
 
@@ -35,7 +39,7 @@ public class TaskService implements ITaskService {
     @Override
     public void removeTask(Integer id) {
         Task task = repository.get(id).orElseThrow();
-        task.setState(TaskState.CANCELED);
+        task = task.cancelTask();
         repository.update(task);
     }
 

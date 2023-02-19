@@ -14,6 +14,4 @@ public interface ITaskRepository {
     void update(Task updatedTask);
 
     List<Task> getAll();
-
-
 }
