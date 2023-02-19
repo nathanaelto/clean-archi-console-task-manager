@@ -3,7 +3,6 @@ package org.esgi.infrastructure.repository.json;
 import org.esgi.domain.models.Task;
 import org.esgi.domain.repository.ITaskRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,7 +18,6 @@ public class JsonRepository implements ITaskRepository {
         this.jsonFileRepository = jsonFileRepository;
     }
 
-    //todo notifier d'un echec
     @Override
     public Optional<Integer> add(Task task) {
         try {
@@ -41,7 +39,6 @@ public class JsonRepository implements ITaskRepository {
         return Optional.empty();
     }
 
-    //todo notifier d'un echec
     @Override
     public Optional<Task> get(Integer id) {
         try {
