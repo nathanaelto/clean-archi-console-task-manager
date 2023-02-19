@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class JsonFileRepository {
     private final String path;
@@ -21,7 +22,23 @@ public class JsonFileRepository {
 
     public List<Task> load() throws FileNotFoundException {
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (json, type, jsonDeserializationContext) -> LocalDateTime.parse(json.getAsJsonPrimitive().getAsString(), formatter))
+                .registerTypeAdapter(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
+
+                    @Override
+                    public LocalDateTime deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+                        return LocalDateTime.parse(jsonElement.getAsJsonPrimitive().getAsString(), formatter);
+                    }
+                })
+                .registerTypeAdapter(Optional.class, new JsonDeserializer<Optional<LocalDateTime>>() {
+                    @Override
+                    public Optional<LocalDateTime> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+                        if (jsonElement.isJsonNull()) {
+                            return Optional.empty();
+                        }
+                        return Optional.of(LocalDateTime.parse(jsonElement.getAsJsonPrimitive().getAsString(), formatter));
+                    }
+                })
+                .serializeNulls()
                 .create();
 
         JsonReader reader = new JsonReader(new FileReader(path));
@@ -31,7 +48,22 @@ public class JsonFileRepository {
 
     public void save(List<Task> tasks) throws IOException {
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) (o, type, jsonSerializationContext) -> new JsonPrimitive(o.format(formatter)))
+                .registerTypeAdapter(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
+                    @Override
+                    public JsonElement serialize(LocalDateTime o, Type type, JsonSerializationContext jsonSerializationContext) {
+                        return new JsonPrimitive(o.format(formatter));
+                    }
+                })
+                .registerTypeAdapter(Optional.class, new JsonSerializer<Optional<LocalDateTime>>() {
+                    @Override
+                    public JsonElement serialize(Optional<LocalDateTime> o, Type type, JsonSerializationContext jsonSerializationContext) {
+                        if (o.isEmpty()) {
+                            return JsonNull.INSTANCE;
+                        }
+                        return new JsonPrimitive(o.get().format(formatter));
+                    }
+                })
+                .serializeNulls()
                 .setPrettyPrinting()
                 .create();
         FileWriter fileWriter = new FileWriter(path);

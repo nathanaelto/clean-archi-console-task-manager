@@ -109,7 +109,15 @@ public class CLIInterface implements UserInterface {
             throw new RuntimeException("Wrong argument number");
         }
 
-        return TaskState.valueOf(args[i]);
+        return switch (args[i]) {
+            case "todo" -> TaskState.TODO;
+            case "progress" -> TaskState.IN_PROGRESS;
+            case "done" -> TaskState.DONE;
+            case "cancelled" -> TaskState.CANCELED;
+            case "closed" -> TaskState.CLOSED;
+            case "pending" -> TaskState.PENDING;
+            default -> throw new RuntimeException("Unkwonw argument: " + args[0]);
+        };
     }
 
     private String parseContent(int i) {

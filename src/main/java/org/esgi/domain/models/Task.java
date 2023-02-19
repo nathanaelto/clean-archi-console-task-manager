@@ -11,8 +11,8 @@ public class Task {
     public final String description;
     public final LocalDateTime creationDate;
     public final Optional<LocalDateTime> dueDate;
-    private final Optional<LocalDateTime> closeDate;
-    private final TaskState state;
+    public final Optional<LocalDateTime> closeDate;
+    public final TaskState state;
 
     public final static Integer UNDEFINED_ID = -1;
 
