@@ -1,13 +1,13 @@
 package org.esgi.domain.models;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 
 // todo factory with localdatetime
 // todo implement subtask
+// todo implement tags
 
 public class Task {
     private final Integer id;
