@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface ITaskRepository {
 
-    void add(Task task);
+    Integer add(Task task);
 
     Optional<Task> get(Integer id);
 

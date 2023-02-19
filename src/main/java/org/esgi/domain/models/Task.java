@@ -8,23 +8,18 @@ public class Task {
 
     public String description;
     public final LocalDateTime creationDate;
-    public Optional<LocalDateTime> dueDate;
+    public LocalDateTime dueDate;
 
     private LocalDateTime closeDate;
     private TaskState state;
 
 
-    public Task(String description) {
+    public Task(Integer id, String description, LocalDateTime dueDate, TaskState state) {
         this.description = description;
-        this.dueDate = Optional.empty();
-
+        this.id = id;
+        this.dueDate = dueDate;
+        this.state = state;
         creationDate = LocalDateTime.now();
-        state = TaskState.TODO;
-    }
-
-    public Task(String description, LocalDateTime dueDate) {
-        this(description);
-        this.dueDate = Optional.of(dueDate);
     }
 
     public void setState(TaskState state) {

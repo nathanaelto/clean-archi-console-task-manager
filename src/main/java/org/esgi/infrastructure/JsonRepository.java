@@ -10,15 +10,18 @@ import java.util.Optional;
 
 public class JsonRepository implements ITaskRepository {
 
-    private JsonFileRepository jsonFileRepository;
+    private final JsonFileRepository jsonFileRepository;
     private List<Task> tasks;
 
-    public JsonRepository(JsonFileRepository jsonFileRepository) {
+    public JsonRepository(JsonFileRepository jsonFileRepository) throws Exception {
         this.jsonFileRepository = jsonFileRepository;
     }
 
     private void load() throws Exception {
         tasks = jsonFileRepository.load();
+        if (tasks == null) {
+            tasks = new ArrayList<>();
+        }
     }
 
     private void save() throws Exception {
@@ -26,15 +29,20 @@ public class JsonRepository implements ITaskRepository {
     }
 
     @Override
-    public void add(Task task) {
+    public Integer add(Task task) {
         try {
             this.load();
+            if (task.id == null) {
+                task.id = tasks.size();
+            }
             tasks.add(task);
             this.save();
+            return task.id;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        return null;
     }
 
     @Override
@@ -56,11 +64,12 @@ public class JsonRepository implements ITaskRepository {
     public void update(Task updatedTask) {
         try {
             this.load();
-            for (Task task : tasks) {
-                if (Objects.equals(task.id, updatedTask.id)) {
-                    task = updatedTask;
-                }
+
+            if( tasks.removeIf(task -> Objects.equals(task.id, updatedTask.id)))
+            {
+                tasks.add(updatedTask);
             }
+
             this.save();
         } catch (Exception e) {
             e.printStackTrace();
@@ -68,7 +77,7 @@ public class JsonRepository implements ITaskRepository {
     }
 
     @Override
-    public List<Task> getAll(){
+    public List<Task> getAll() {
         try {
             this.load();
             return tasks;

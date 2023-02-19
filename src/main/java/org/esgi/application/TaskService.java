@@ -16,8 +16,14 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void addTask(Task task) {
-        repository.add(task);
+    public Integer addTask(Task task) {
+        Integer id =  repository.add(task);
+        if(id == null)
+        {
+            throw new RuntimeException("Error while adding task");
+        }
+
+        return task.id;
     }
 
     @Override
@@ -27,7 +33,8 @@ public class TaskService implements ITaskService {
 
     //todo call le update avec le statue "cancel"
     @Override
-    public void removeTask(Task task) {
+    public void removeTask(Integer id) {
+        Task task = repository.get(id).orElseThrow();
         task.setState(TaskState.CANCELED);
         repository.update(task);
     }
