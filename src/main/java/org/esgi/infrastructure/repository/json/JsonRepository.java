@@ -22,17 +22,29 @@ public class JsonRepository implements ITaskRepository {
     public Optional<Integer> add(Task task) {
         try {
             List<JsonTask> tasks = jsonFileRepository.load();
-            int newId = tasks.size();
+            List<JsonTask> subTasks = tasks
+                    .stream()
+                    .flatMap(t -> t.getSubTasks().stream()).toList();
+            List<JsonTask> allTasks = Stream.concat(tasks.stream(), subTasks.stream()).toList();
+            int newId = allTasks.size();
             while (Objects.equals(task.getId(), UNDEFINED_ID)) {
                 int finalNewId = newId;
-                if (tasks.stream().noneMatch(t -> Objects.equals(t.getId(), finalNewId))) {
+                if (allTasks.stream().noneMatch(t -> Objects.equals(t.getId(), finalNewId))) {
                     break;
                 }
                 newId++;
             }
-            tasks.add(new JsonTask(task.updateTaskId(newId)));
+            Task newTask = task.updateTaskId(newId);
+            if (newTask.getParentId().isPresent()) {
+                Task newParentTask = get(newTask.getParentId().get()).orElseThrow();
+                newParentTask = newParentTask.addSubTask(newTask);
+                tasks = tasks.stream().filter(t -> !t.getId().equals(newTask.getParentId().get())).toList();
+                tasks = Stream.concat(tasks.stream(), Stream.of(new JsonTask(newParentTask))).toList();
+            } else {
+                tasks = Stream.concat(tasks.stream(), Stream.of(new JsonTask(newTask))).toList();
+            }
             jsonFileRepository.save(tasks);
-            return Optional.of(task.getId());
+            return Optional.of(newTask.getId());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -42,7 +54,12 @@ public class JsonRepository implements ITaskRepository {
     @Override
     public Optional<Task> get(Integer id) {
         try {
-            return jsonFileRepository.load()
+            List<JsonTask> tasks = jsonFileRepository.load();
+            List<JsonTask> subTasks = tasks
+                    .stream()
+                    .flatMap(task -> task.getSubTasks().stream()).toList();
+            tasks = Stream.concat(tasks.stream(), subTasks.stream()).toList();
+            return tasks
                     .stream()
                     .filter(task -> Objects.equals(task.getId(), id))
                     .findFirst()
@@ -53,22 +70,42 @@ public class JsonRepository implements ITaskRepository {
         return Optional.empty();
     }
 
-    //todo notifier d'un echec
     @Override
     public void update(Task updatedTask) {
         try {
-            List<JsonTask> tasks = jsonFileRepository.load()
-                    .stream()
-                    .filter(task -> !Objects.equals(task.getId(), updatedTask.getId()))
-                    .toList();
+            List<JsonTask> tasks;
+            if (updatedTask.getParentId().isPresent()) {
+                tasks = jsonFileRepository.load()
+                        .stream()
+                        .filter(task -> !Objects.equals(task.getId(), updatedTask.getParentId().get()))
+                        .toList();
+                Task parent = get(updatedTask.getParentId().get()).orElseThrow();
 
-            jsonFileRepository.save(Stream.concat(tasks.stream(), Stream.of(new JsonTask(updatedTask))).toList());
+                Task newParent = new Task(
+                        parent.getId(),
+                        parent.getDescription(),
+                        parent.getCreationDate(),
+                        parent.getDueDate(),
+                        parent.getCloseDate(),
+                        parent.getState(),
+                        parent.getTag(),
+                        Stream.concat(parent.getSubTasks().stream().filter(task -> !task.getId().equals(updatedTask.getId())), Stream.of(updatedTask)).toList(),
+                        parent.getParentId()
+                );
+                tasks = Stream.concat(tasks.stream(), Stream.of(new JsonTask(newParent))).toList();
+            } else {
+                tasks = jsonFileRepository.load()
+                        .stream()
+                        .filter(task -> !Objects.equals(task.getId(), updatedTask.getId()))
+                        .toList();
+                tasks = Stream.concat(tasks.stream(), Stream.of(new JsonTask(updatedTask))).toList();
+            }
+            jsonFileRepository.save(tasks);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    //todo notifier d'un echec
     @Override
     public List<Task> getAll() {
         try {
