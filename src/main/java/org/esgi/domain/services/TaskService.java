@@ -38,6 +38,7 @@ public class TaskService implements ITaskService {
         repository.update(task);
     }
 
+    /// TODO : Sort by date (more recent first)
     @Override
     public List<Task> getAllTasks() {
         return repository.getAll();

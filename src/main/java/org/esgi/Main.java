@@ -8,11 +8,17 @@ import org.esgi.infrastructure.exposition.CLIInterface;
 import org.esgi.infrastructure.repository.json.JsonFileRepository;
 import org.esgi.infrastructure.repository.json.JsonRepository;
 
+import java.nio.file.FileSystems;
+
 //todo faire le script pour lancer le programme
 //todo faire le script pour lancer les tests
 public class Main {
     public static void main(String[] args) {
-        ITaskRepository taskRepository = new JsonRepository(new JsonFileRepository("./tasks.json"));
+        String userDirectory = System.getProperty("user.home");
+        String storageFile = ".consoleagenda/data.json";
+        String storagePath = userDirectory + FileSystems.getDefault().getSeparator() + storageFile;
+
+        ITaskRepository taskRepository = new JsonRepository(new JsonFileRepository(storagePath));
         ITaskService taskService = new TaskService(taskRepository);
         UserInterface userInterface = new CLIInterface(taskService);
         userInterface.processUserInputs(args);

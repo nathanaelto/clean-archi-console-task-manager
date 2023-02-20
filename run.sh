@@ -1,5 +1,4 @@
 #!/bin/bash
-touch tasks.json
 
 ./mvnw clean install
 # ajouter une tâche
