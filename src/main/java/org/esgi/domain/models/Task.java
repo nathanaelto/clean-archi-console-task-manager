@@ -132,10 +132,10 @@ public class Task {
         return "id=" + id +
                 ", description='" + description + '\'' +
                 ", creationDate=" + creationDate +
-                ", dueDate=" + dueDate +
-                ", closeDate=" + closeDate +
+                ", dueDate=" + dueDate.orElse(null) +
+                ", closeDate=" + closeDate.orElse(null) +
                 ", state=" + state +
-                ", tag=" + tag +
+                ", tag=" + tag.orElse(null) +
                 "\n\tsubTasks=" + subTasks;
     }
 }

@@ -15,15 +15,18 @@ Or found in [this file](./members.md)
 
 ## How to use
 
+### Prerequisites
+:warning: You need to install java 19 on your machine.
+
 ### Setup
 
 Run script `./setup.sh` to init file who datas are store.
 
 ### Run
 
+:bell: `nvmw` is provided to you to avoid having to install maven on your machine. It permits to run the projets.
 
-Il est également a noter que mvnw vous est fourni pour vous éviter d'avoir à installer maven sur votre machine.
+The script `./run.sh` is provided to you to run the project. With it, you can see an example of how to use the project.
 
-Le projet nécessite néanmoins d'avoir java 19 installé sur votre machine.
-
-Vous avez a votre disposition le fichier `./run.sh` qui vous fera une démonstration du projet ainsi que vous servir d'exemple pour savoir les commandes à utiliser.
+### Test
+The script `./test.sh` is provided to you to run the tests.

@@ -10,8 +10,6 @@ import org.esgi.infrastructure.repository.json.JsonRepository;
 
 import java.nio.file.FileSystems;
 
-//todo faire le script pour lancer le programme
-//todo faire le script pour lancer les tests
 public class Main {
     public static void main(String[] args) {
         String userDirectory = System.getProperty("user.home");

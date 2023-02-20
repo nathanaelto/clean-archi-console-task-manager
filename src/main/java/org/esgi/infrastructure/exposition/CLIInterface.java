@@ -78,7 +78,8 @@ public class CLIInterface implements UserInterface {
 
         taskService.getAllTasks()
                 .stream()
-                .sorted(Comparator.comparing(Task::getCreationDate))
+                .sorted(Comparator.comparing(Task::getCreationDate)
+                .reversed())
                 .toList()
                 .forEach(System.out::println);
     }
