@@ -7,13 +7,11 @@ import java.util.Optional;
 
 public interface ITaskRepository {
 
-    void add(Task task);
+    Optional<Integer> add(Task task);
 
     Optional<Task> get(Integer id);
 
     void update(Task updatedTask);
 
     List<Task> getAll();
-
-
 }
